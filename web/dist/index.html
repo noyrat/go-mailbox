@@ -1,0 +1,616 @@
+<!doctype html>
+<html class="mdui-theme-auto">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"/>
+        <meta name="renderer" content="webkit"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <!-- <script src="/assets/mdui.global.js"></script> -->
+        <link rel="stylesheet" href="https://unpkg.com/mdui@2.0.1/mdui.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+        <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.js"></script>
+        <link rel="stylesheet" href="/assets/index.css">
+    </head>
+    <body>
+        <mdui-layout>
+            <mdui-navigation-drawer id="drawer" close-on-overlay-click placement="left">
+                <div class="app-bar-control flex row">
+                    <div class="path-control flex w100 space-between" path="/setting" >
+                        <mdui-button-icon id="btn-back" icon="arrow_back"></mdui-button-icon>
+                        <mdui-dropdown>
+                            <mdui-button-icon slot="trigger" icon="light_mode--outlined" alt="主题"></mdui-button-icon>
+                            <mdui-menu class="appbar-theme-menu" selects="single" value="auto">
+                            <mdui-menu-item value="light">亮色模式</mdui-menu-item>
+                            <mdui-menu-item value="dark">暗色模式</mdui-menu-item>
+                            <mdui-divider></mdui-divider>
+                            <mdui-menu-item value="auto" selected>跟随系统</mdui-menu-item>
+                            </mdui-menu>
+                        </mdui-dropdown>
+                    </div>
+                    <div class="path-control flex row align-center grow" path="/mail">
+                        <mdui-button-icon id="btn-setting" icon="settings"></mdui-button-icon>
+                        <mdui-dropdown id="dropdown-mail-account">
+                            <mdui-text-field slot="trigger" readonly variant="outlined" type="text" name="" value="">
+                            </mdui-text-field>
+                            <mdui-menu>
+                            </mdui-menu>
+                        </mdui-dropdown>
+                    </div>
+                </div>
+                <div id="mailbox-list" class="path-control over-y shrink0" path="/mail">
+                    <mdui-list></mdui-list>
+                </div>
+                <div id="setting-list" class="path-control over-y" path="/setting">
+                    <mdui-list></mdui-list>
+                </div>
+                <div class="flex grow"></div>
+                <div class="flex row" style="margin: 1rem;">
+                    <div class="flex grow flex-center">
+                    </div>
+                    <div class="flex grow flex-center">
+                        <mdui-button variant="filled" icon="logout" href="/logout">登出</mdui-button>
+                    </div>
+                </div>
+            </mdui-navigation-drawer>
+            <mdui-top-app-bar class="flex row nopadding" style="z-index: 0;">
+                <div id="app-bar" class="flex row" style="box-sizing: border-box;">
+                    <div class="w100 app-bar-control flex row space-between grow ">
+                        <mdui-button-icon id="btn-menu" icon="menu" onclick="javascript:$('#drawer').attr('open','')"></mdui-button-icon>
+                        <div class="path-control" path="/mail">
+                            <div class="sleft">
+                                <mdui-text-field variant="outlined">
+                                    <mdui-button-icon id="btn-mail-search" slot="end-icon" icon="search"></mdui-button-icon>
+                                </mdui-text-field>
+                            </div>
+                        </div>
+                        <div class="path-control" path="/setting/mailAccount">
+                            <mdui-button-icon id="btn-mail-account-add" variant="filled" icon="add"></mdui-button-icon>
+                            <mdui-button-icon id="btn-mail-account-edit" variant="filled" icon="edit"></mdui-button-icon>
+                            <mdui-button-icon id="btn-mail-account-delete" variant="filled" icon="delete"></mdui-button-icon>
+                        </div>
+                        <div class="path-control" path="/setting/webhook">
+                            <mdui-button-icon id="btn-webhook-add" variant="filled" icon="add"></mdui-button-icon>
+                            <mdui-button-icon id="btn-webhook-edit" variant="filled" icon="edit"></mdui-button-icon>
+                            <mdui-button-icon id="btn-webhook-delete" variant="filled" icon="delete"></mdui-button-icon>
+                        </div>
+                        <div class="flex grow"></div>
+                    </div>
+                    <div class="app-bar-control flex">
+                        <mdui-button-icon id="btn-mail-back" icon="arrow_back"></mdui-button-icon>
+                    </div>
+                </div>
+            </mdui-top-app-bar>
+            <mdui-layout-main class="example-layout-main">
+                <mdui-snackbar id="hint"  auto-close-delay="1500" placement="top"></mdui-snackbar>
+                <mdui-dialog id="loading"><mdui-circular-progress></mdui-circular-progress></mdui-dialog>
+                <mdui-dialog id="dialog-webhook" class="margin-children"
+                headline="Webhook"
+                close-on-overlay-click
+                >
+                    <mdui-text-field label="name"></mdui-text-field>
+                    <mdui-select label="method" value="GET">
+                        <mdui-menu-item value="GET">GET</mdui-menu-item>
+                        <mdui-menu-item value="POST">POST</mdui-menu-item>
+                    </mdui-select>
+                    <mdui-text-field label="url"></mdui-text-field>
+                    <mdui-text-field label="header" rows="3"></mdui-text-field>
+                    <mdui-text-field label="body" rows="3"></mdui-text-field>
+                    <mdui-button slot="action" variant="text" onclick="javascript:$('#dialog-webhook').removeAttr('open')">取消</mdui-button>
+                    <mdui-button id="btn-webhook-save" slot="action" variant="tonal">保存</mdui-button>
+                </mdui-dialog>
+                <mdui-dialog id="dialog-mail-account" class="margin-children"
+                headline="Mail Account"
+                close-on-overlay-click
+                >
+                    <mdui-select label="type">
+                        <mdui-menu-item value="basic" seleted>Basic</mdui-menu-item>
+                        <mdui-menu-item value="google_oauth">Google OAuth</mdui-menu-item>
+                        <mdui-menu-item value="outlook_oauth">Outlook OAuth</mdui-menu-item>
+                    </mdui-select>
+                    <mdui-text-field label="email"></mdui-text-field>
+                    <mdui-text-field label="password" type="password" toggle-password></mdui-text-field>
+                    
+                    <mdui-text-field label="host"></mdui-text-field>
+                    <mdui-text-field label="port"></mdui-text-field>
+                    <mdui-button slot="action" variant="text" onclick="javascript:$('#dialog-mail-account').removeAttr('open')">取消</mdui-button>
+                    <mdui-button label="save" id="btn-mail-account-save" slot="action" variant="tonal">保存</mdui-button>
+                    <mdui-button label="refresh" slot="action">Refresh OAuth</mdui-button>
+                </mdui-dialog>
+                <div id="login-container" class="layout-container">
+                    <mdui-card>
+                        <div class="mdui-prose h100 flex column margin-children">
+                            <h1 class="text-center" style="margin-bottom: 0;">Sign in</h1>
+                            <mdui-text-field label="username"></mdui-text-field>
+                            <mdui-text-field label="password" type="password" toggle-password></mdui-text-field>
+                            <div class="flex row flex-center">
+                                <mdui-button id="btn-login">Login</mdui-button>
+                            </div>
+                        </div>
+                    </mdui-card>
+                </div>
+                <div id="register-container" class="layout-container">
+                    <mdui-card>
+                        <div class="mdui-prose h100 flex column margin-children">
+                            <h1 class="text-center" style="margin-bottom: 0;">Sign up</h1>
+                            <mdui-text-field label="username"></mdui-text-field>
+                            <mdui-text-field label="password" type="password" toggle-password></mdui-text-field>
+                            <mdui-text-field label="verify" type="password" toggle-password></mdui-text-field>
+                            <div class="flex row flex-center">
+                                <mdui-button id="btn-register">Register</mdui-button>
+                            </div>
+                        </div>
+                    </mdui-card>
+                </div>
+                <div id="mail-container" class="layout-container flex h100 w100 row over-hidden">
+                    <mdui-divider vertical></mdui-divider>
+                    <div id="mail-list" class="flex column space-between shrink0">
+                        <div class="over-y">
+                            <mdui-list></mdui-list>
+                        </div>
+                        <div style="padding: 0.5rem;">
+                            <mdui-segmented-button-group id="mail-page-control">
+                                <mdui-segmented-button id="mail-page-first">
+                                    <mdui-icon slot="icon" name="first_page"></mdui-icon>
+                                </mdui-segmented-button>
+                                <mdui-segmented-button id="mail-page-prev">
+                                    <mdui-icon slot="icon" name="keyboard_arrow_left"></mdui-icon>
+                                </mdui-segmented-button>
+                                <mdui-text-field id="mail-page-input" class="grow" variant="outlined" placeholder="1 / 1">
+                                </mdui-text-field>
+                                <mdui-segmented-button id="mail-page-next">
+                                    <mdui-icon slot="icon" name="keyboard_arrow_right"></mdui-icon>
+                                </mdui-segmented-button>
+                                <mdui-segmented-button id="mail-page-last">
+                                    <mdui-icon slot="icon" name="last_page"></mdui-icon>
+                                </mdui-segmented-button>
+                            </mdui-segmented-button-group>
+                        </div>
+                    </div>
+                    
+                    <div id="mail-content" class="flex column grow mdui-prose margin-children over-y">
+                        <h3 tag="subject">title</h3>
+                        <mdui-divider></mdui-divider>
+                        <div tag="from" class="flex row align-center">
+                            From: <div class="flex"></div>
+                        </div>
+                        <div tag="to" class="flex row align-center">
+                            To: <div class="flex"></div>
+                        </div>
+                        <div>
+                            <mdui-segmented-button-group tag="btn-group" selects="single" style="height:2rem;--shape-corner: 4px;">
+                                <mdui-segmented-button icon="short_text" value="text">
+                                    Text
+                                </mdui-segmented-button>
+                                <mdui-segmented-button icon="html" value="html">
+                                    Html
+                                </mdui-segmented-button>
+                            </mdui-segmented-button-group>
+                        </div>
+                        <div>
+                            <div tag="text" style="white-space:pre-line;word-wrap:break-word"></div>
+                            <div tag="html"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="setting-container" class="layout-container flex h100 w100 row over-hidden">
+                    <mdui-divider vertical></mdui-divider>
+                    <div id="setting-content" class="over-y">
+                        <div path="/setting/login" class="mdui-prose margin-children">
+                            <h3>Login</h3>
+                            <mdui-text-field label="username"></mdui-text-field>
+                            <mdui-text-field label="password" type="password" toggle-password></mdui-text-field>
+                            <mdui-text-field label="new password" type="password" toggle-password></mdui-text-field>
+                            <div class="flex space-around">
+                                <mdui-button id="btn-setting-login-save">保存</mdui-button>
+                            </div>
+                        </div>
+                        <div path="/setting/oauth" class="mdui-prose margin-children">
+                            <h3>Google OAuth</h3>
+                            <mdui-text-field label="Google Client Id"></mdui-text-field>
+                            <mdui-text-field label="Google Client Secret"></mdui-text-field>
+                            <mdui-text-field label="Google Redirect Url" readonly></mdui-text-field>
+                            <mdui-divider></mdui-divider>
+                            <h3>Outlook OAuth</h3>
+                            <mdui-text-field label="Outlook Client Id"></mdui-text-field>
+                            <mdui-text-field label="Outlook Client Secret"></mdui-text-field>
+                            <mdui-text-field label="Outlook Redirect Url" readonly></mdui-text-field>
+                            <div class="flex space-around">
+                                <mdui-button id="btn-setting-oauth-save">保存</mdui-button>
+                            </div>
+                        </div>
+                        <div path="/setting/mailAccount">
+                            <mdui-text-field id="mail-account-filter" label="filter" icon="filter_list"></mdui-text-field>
+                            <mdui-list style="padding-top: 1.5rem;"></mdui-list>
+                        </div>
+                        <div path="/setting/webhook">
+                            <mdui-text-field id="webhook-filter" label="filter" icon="filter_list"></mdui-text-field>
+                            <mdui-list style="padding-top: 1.5rem;"></mdui-list>
+                        </div>
+                    </div>
+                </div>
+            </mdui-layout-main>
+        </mdui-layout>
+        
+        <script src="https://unpkg.com/mdui@2.0.1/mdui.global.js"></script>
+        <script src="/assets/router.js"></script>
+        <script src="/assets/index.js"></script> 
+        <script>
+            $(document).on('mouseenter','mdui-button-icon',function(e){
+                var icon = e.currentTarget.getAttribute("icon");
+                if (icon.endsWith("--outlined")){
+                    e.currentTarget.setAttribute("icon",icon.replace("--outlined",""))
+                }
+            })
+            $(document).on('mouseleave','mdui-button-icon',function(e){
+                var icon = e.currentTarget.getAttribute("icon");
+                if (!icon.endsWith("--outlined")){
+                    e.currentTarget.setAttribute("icon",icon + "--outlined")
+                }
+            })
+            $(document).on('click','mdui-dropdown mdui-button-icon',function(e){
+                var dropdown = e.currentTarget.parentElement
+                var menu = dropdown.querySelector("mdui-menu")
+                var opened = dropdown.getAttribute("open")??false
+                dropdown.setAttribute("open",!opened)
+            })
+
+            
+            function hint(msg){
+                $("#hint").text(msg)
+                $("#hint").attr('open','')
+            }
+            function navigateMail(accountId,boxName,pageNum,search,mailId=null){
+                if (accountId == null){
+                    accountId = window.store.searchParams.accountId??0
+                }
+                if (boxName == null){
+                    boxName = window.store.boxName??"INBOX"
+                }
+                if (pageNum == null){
+                    pageNum = window.store.searchParams.pageNum??1
+                }
+                if (search == null){
+                    search = $("#btn-mail-search").parent().val()
+                }
+                var mailIdStr = ""
+                if (mailId != null){
+                    mailIdStr = `&mailId=${mailId}`
+                }
+                $.router.set(`/mail?accountId=${accountId}&boxName=${boxName}&pageNum=${pageNum}&search=${search}${mailIdStr}`)
+            }
+            /* items */
+            for (var v of ["webhook","mail-account"]){
+                $(document).on('click',`.${v}-item`,function(e){
+                    var activeItem = $(`.${v}-item[active='true']`)
+                    if (activeItem&&activeItem[0] == e.currentTarget){
+                        e.currentTarget.removeAttribute("active")
+                        $(`#btn-${v}-edit`).attr("disabled",'')
+                        $(`#btn-${v}-delete`).attr("disabled",'')
+                    }else if (activeItem){
+                        $(`#btn-${v}-edit`).removeAttr("disabled")
+                        $(`#btn-${v}-delete`).removeAttr("disabled")
+                        $(`.${v}-item`).removeAttr('active')
+                        e.currentTarget.setAttribute("active","true")
+                    }
+                })
+            }
+            
+            $(document).on('click',`#dropdown-mail-account mdui-menu-item`,function(e){
+                var target = $(e.currentTarget)
+                var index = target.attr('data-id')
+                var newAccountId = index == -1?0:window.store.setting.mailAccounts[index].i
+                if ((window.store.searchParams.accountId??0)==newAccountId){
+                    return
+                }
+                $("#dropdown-mail-account mdui-text-field").attr('value',target.text())
+                if (index == -1){
+                    navigateMail(0,"ALL",1,"")
+                }else{
+                    navigateMail(newAccountId,"INBOX",1,"")
+                }
+            })
+            $(document).on('input','#mail-page-input',function(e){
+                e.currentTarget.value = e.currentTarget.value.replace(/[^\d]/g,'')
+            })
+            $(document).on('change','#mail-page-input',async function(e){
+                var target = $(e.currentTarget)
+                var pageNum = e.currentTarget.value
+                if (pageNum == ''){return}
+                if (parseInt(pageNum) < 1){
+                    target.val(1)
+                }else if (parseInt(pageNum) > window.store.pageTotal){
+                    target.val(window.store.pageTotal)
+                }
+                await initMailList()
+                navigateMail(null,null,parseInt(target.val()),null)
+                target.val('')
+            })
+            $(document).on('click','#mail-page-first',function(e){
+                navigateMail(null,null,1,null)
+            })
+            $(document).on('click','#mail-page-prev',function(e){
+                navigateMail(null,null,parseInt(window.store.searchParams.pageNum)-1,null)
+            })
+            $(document).on('click','#mail-page-next',function(e){
+                navigateMail(null,null,parseInt(window.store.searchParams.pageNum??"1")+1,null)
+            })
+            $(document).on('click','#mail-page-last',function(e){
+                navigateMail(null,null,window.store.pageTotal,null)
+            })
+            $(document).on('click','.mail-box-item',function(e){
+                var boxName = $(e.currentTarget).attr("data-n")
+                navigateMail(null,boxName,1,"")
+            })
+            $(document).on('click','.mail-list-item',function(e){
+                var mailId = $(e.currentTarget).attr("data-i")
+                navigateMail(null,null,null,null,mailId)
+            })
+            /* oauth */
+            $(document).on('click','#btn-setting-oauth-save',async function(e){
+                var div = $("div[path='/setting/oauth']")
+                var data = {
+                    gid:div.find('[label="Google Client Id"]').val(),
+                    gs:div.find('[label="Google Client Secret"]').val(),
+                    gu:div.find('[label="Google Redirect Url"]').val(),
+                    oid:div.find('[label="Outlook Client Id"]').val(),
+                    os:div.find('[label="Outlook Client Secret"]').val(),
+                    ou:div.find('[label="Outlook Redirect Url"]').val()
+                }
+                loading()
+                await api.call(api.setting.saveOAuth(webhook),
+                    async (r)=>{await initSettingOAuth()})
+                stopLoading()
+            })
+            /* mailAccount */
+            function checkMailAccount(account){
+                if (!account.email){hint("email is empty");return false;}
+                if (!account.passwd){hint("password is empty");return false;}
+                if (!account.host){hint("host is empty");return false;}
+                if (!account.port){hint("port is empty");return false;}
+                if (!parseInt(account.port)){hint("port must be int");return false;}
+                if (!account.type){hint("type is empty");return false;}
+                return true;
+            }
+            $(document).on('input','#mail-account-filter',function(e){
+                var v = e.target.value
+                $("#setting-content div[path='/setting/mailAccount'] mdui-list-item").hide()
+                var index = 0
+                for (var item of window.store.setting.mailAccounts){
+                    if (item.e.toUpperCase().indexOf(v.toUpperCase()) > -1){
+                        $(`#setting-content div[path='/setting/mailAccount'] mdui-list-item[data-id='${index}']`).show()
+                    }
+                    index++
+                }
+            })
+            $(document).on("change",".mail-account-item mdui-switch",async function(e){
+                if ($(e.currentTarget).attr("freeze")){
+                    return
+                }
+                let index = $(e.currentTarget).parent().attr("data-id")
+                let accountId = window.store.setting.mailAccounts[index].i
+                loading()
+                var success = false
+                await api.call(api.setting.switchMailAccount(accountId,e.currentTarget.checked?1:2),
+                async (r)=>{success = true},)
+                stopLoading()
+                if (!success){
+                    $(e.currentTarget).attr("freeze",'true')
+                    e.currentTarget.checked?$(e.currentTarget).removeAttr("checked"):$(e.currentTarget).attr("checked",'')
+                    $(e.currentTarget).removeAttr("freeze")
+                }
+            })
+            $(document).on('click','#btn-mail-account-add',function(e){
+                var dialog = $('#dialog-mail-account')
+                $('#dialog-mail-account *').removeAttr("disabled").removeAttr("data-id")
+                dialog.find('[label="type"]').val('basic')
+                dialog.find('[label="email"]').val('')
+                dialog.find('[label="password"]').val('')
+                dialog.find('[label="host"]').val('')
+                dialog.find('[label="port"]').val('')
+                dialog.find('[label="save"]').show()
+                dialog.find('[label="refresh"]').hide()
+                dialog.attr('open','')
+            })
+            $(document).on('click','#btn-mail-account-edit',function(e){
+                var index = $("#setting-content div[path='/setting/mailAccount'] mdui-list-item[active]").attr('data-id')
+                var mailAccount = window.store.setting.mailAccounts[index]
+                var dialog = $('#dialog-mail-account')
+                dialog.attr("data-id",mailAccount.i)
+                $('#dialog-mail-account *').removeAttr("disabled")
+                dialog.find('[label="type"]').val(mailAccount.t).attr("disabled",'')
+                dialog.find('[label="email"]').val(mailAccount.e)
+                dialog.find('[label="password"]').val('')
+                dialog.find('[label="host"]').val(mailAccount.h)
+                dialog.find('[label="port"]').val(mailAccount.p)
+                dialog.find('[label="save"]').show()
+                dialog.find('[label="refresh"]').hide()
+                if (mailAccount.t == "oauth"){
+                    var oauth = mailAccount.e.endsWith("gmail.com")?"google_oauth":
+                                mailAccount.e.endsWith("outlook.com")?"outlook_oauth":""
+                    dialog.find('[label="type"]').val(oauth)
+                    $("#btn-mail-account-save").attr("disabled",'')
+                    dialog.find('[label="type"]').attr("disabled",'')
+                    dialog.find('[label="email"]').attr("disabled",'')
+                    dialog.find('[label="password"]').attr("disabled",'')
+                    dialog.find('[label="host"]').attr("disabled",'')
+                    dialog.find('[label="port"]').attr("disabled",'')
+                    dialog.find('[label="save"]').hide()
+                    dialog.find('[label="refresh"]').show()
+                }
+                dialog.attr('open','')
+            })
+            $(document).on('click','#btn-mail-account-delete',async function(e){
+                var index = $("#setting-content div[path='/setting/mailAccount'] mdui-list-item[active]").attr('data-id')
+                var account = window.store.setting.mailAccounts[index]
+                loading()
+                await api.call(api.setting.deleteMailAccount(account.i),
+                    async (r) => {await initSettingMailAccount()}
+                )
+                stopLoading()
+            })
+            $(document).on('click','#btn-mail-account-save',async function(e){
+                var dialog = $('#dialog-mail-account')
+                var account = {
+                    email:dialog.find('[label="email"]').val(),
+                    passwd:dialog.find('[label="password"]').val(),
+                    host:dialog.find('[label="host"]').val(),
+                    port:dialog.find('[label="port"]').val(),
+                    type:dialog.find('[label="type"]').val()
+                }
+                if (!checkMailAccount(account)){return;}
+                loading()
+                await api.call(api.setting.checkMailAccount(account),
+                    async (r)=>{
+                        await api.call(api.setting.saveMailAccount(account),
+                            async (r) => {
+                                $('#dialog-mail-account').removeAttr('open')
+                                await initSettingMailAccount()
+                            })
+                })
+                stopLoading()
+            })
+            $(document).on('click','#dialog-mail-account [label="refresh"]',function(e){
+                var id = $("#dialog-mail-account").attr("data-id")
+                var v = $("#dialog-mail-account [label='type']").val()
+                let config = window.store.setting.config
+                let target = null;
+                if (v == "google_oauth"){
+                    loading()
+                    target = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${config.gid??''}&redirect_uri=${config.gu??''}&scope=https://mail.google.com/%20https://www.googleapis.com/auth/userinfo.email&access_type=offline&prompt=consent&include_granted_scopes=true`;
+                }else if (v == "outlook_oauth"){
+                    loading()
+                    target = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${config.oid??''}&response_type=code&redirect_uri=${config.ou??''}&response_mode=query&scope=openid%20email%20offline_access%20https%3A%2F%2Foutlook.office.com%2FIMAP.AccessAsUser.All`;
+                }
+                if (target != null){
+                    document.location.href = target+"&state="+id;
+                }
+            })
+            $(document).on('change','#dialog-mail-account [label="type"]',function(e){
+                if ($(e.currentTarget).attr("disabled") != null){
+                    return
+                }
+                var v = e.currentTarget.value
+                let config = window.store.setting.config
+                let target = null;
+                if (v == "google_oauth"){
+                    loading()
+                    target = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${config.gid??''}&redirect_uri=${config.gu??''}&scope=https://mail.google.com/%20https://www.googleapis.com/auth/userinfo.email&access_type=offline&prompt=consent&include_granted_scopes=true`;
+                }else if (v == "outlook_oauth"){
+                    loading()
+                    target = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${config.oid??''}&response_type=code&redirect_uri=${config.ou??''}&response_mode=query&scope=openid%20email%20offline_access%20https%3A%2F%2Foutlook.office.com%2FIMAP.AccessAsUser.All`;
+                }
+                if (target != null){
+                    document.location.href = target;
+                }
+            })
+            
+            /* webhook */
+            function checkWebhook(webhook){
+                if (!webhook.name){hint("name is empty");return false;}
+                if (!webhook.method){hint("method is empty");return false;}
+                if (!webhook.url){hint("url is empty");return false;}
+                if (webhook.header && !isJsonString(webhook.header)){hint("header is not a json");return false;}
+                return true;
+            }
+            $(document).on('input','#webhook-filter',function(e){
+                var v = e.target.value
+                $("#setting-content div[path='/setting/webhook'] mdui-list-item").hide()
+                var index = 0
+                for (var item of window.store.setting.webhook){
+                    if (item.n.toUpperCase().indexOf(v.toUpperCase()) > -1 || item.u.toUpperCase().indexOf(v.toUpperCase()) > -1){
+                        $(`#setting-content div[path='/setting/webhook'] mdui-list-item[data-id='${index}']`).show()
+                    }
+                    index++
+                }
+            })
+            $(document).on('click','#btn-webhook-add',function(e){
+                var dialog = $('#dialog-webhook')
+                dialog.find('[label="name"]').val('')
+                dialog.find('[label="method"]').val('GET')
+                dialog.find('[label="url"]').val('')
+                dialog.find('[label="header"]').val('')
+                dialog.find('[label="body"]').val('')
+                dialog.attr('open','')
+            })
+            $(document).on('click','#btn-webhook-edit',function(e){
+                var index = $("#setting-content div[path='/setting/webhook'] mdui-list-item[active]").attr('data-id')
+                var webhook = window.store.setting.webhook[index]
+                var dialog = $('#dialog-webhook')
+                dialog.find('[label="name"]').val(webhook.n)
+                dialog.find('[label="method"]').val(webhook.m)
+                dialog.find('[label="url"]').val(webhook.u)
+                dialog.find('[label="header"]').val(webhook.h)
+                dialog.find('[label="body"]').val(webhook.b)
+                dialog.attr('open','')
+            })
+            $(document).on('click','#btn-webhook-delete',async function(e){
+                var index = $("#setting-content div[path='/setting/webhook'] mdui-list-item[active]").attr('data-id')
+                var webhook = window.store.setting.webhook[index]
+                loading()
+                await api.call(api.setting.deleteWebhook(webhook.i),
+                    async (r) => {await initSettingWebhook()}
+                )
+                stopLoading()
+            })
+            $(document).on('click','#btn-webhook-save',async function(e){
+                var dialog = $('#dialog-webhook')
+                var webhook = {
+                    name:dialog.find('[label="name"]').val(),
+                    method:dialog.find('[label="method"]').val(),
+                    url:dialog.find('[label="url"]').val(),
+                    header:dialog.find('[label="header"]').val(),
+                    body:dialog.find('[label="body"]').val()
+                }
+                if (!checkWebhook(webhook)){return;}
+                loading()
+                await api.call(api.setting.checkWebhook(webhook),
+                    async (r)=>{
+                        await api.call(api.setting.saveWebhook(webhook),
+                            async (r) => {
+                                $('#dialog-webhook').removeAttr('open')
+                                await initSettingWebhook()
+                            })
+                })
+                stopLoading()
+            })
+            /* theme */
+            $(document).on('change','.appbar-theme-menu',function(e){
+                if (e.currentTarget.value != mdui.getTheme()){
+                    mdui.setTheme(e.currentTarget.value)
+                }
+            })
+            $(document).on('click','#btn-back',function(e){
+                $.router.set(window.store.backUrl??"/mail?accountId=0&boxName=ALL&pageNum=1")
+            })
+            $(document).on('click','#btn-mail-back',function(e){
+                $("#mail-container").animate({ scrollLeft: 0 });
+                $("mdui-top-app-bar").animate({ scrollLeft: 0 });
+            })
+            $(document).on('click','#btn-setting',function(e){
+                window.store.backUrl = window.location.pathname + window.location.search
+                $.router.set("/setting/login")
+            })
+            $(document).on('click','#btn-mail-search',function(e){
+                window.store.search = $(e.currentTarget).parent().val()
+                navigateMail(null,null,1,null)
+            })
+            $(document).on('change',"#mail-content [tag='btn-group']",function(e){
+                if (e.currentTarget.value == ''){
+                    e.currentTarget.value = $('[tag="btn-group"]').attr('value')
+                    $(`[tag="btn-group"] [value="${e.currentTarget.value}"]`).attr("selected",'')
+                    return
+                }
+                var div = $("#mail-content")
+                $('[tag="btn-group"]').attr('value',e.currentTarget.value)
+                if (e.currentTarget.value == 'text'){
+                    div.find("[tag='html']").hide()
+                    div.find("[tag='text']").show()
+                }else {
+                    div.find("[tag='text']").hide()
+                    div.find("[tag='html']").show()
+                }
+            })
+        </script>
+    </body>
+</html>

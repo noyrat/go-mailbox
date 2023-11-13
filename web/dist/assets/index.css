@@ -1,0 +1,237 @@
+
+body,mdui-layout{
+    height:100%;
+    width:100%;
+    overflow: hidden;
+    position: absolute;
+    padding: 0;
+    margin: 0;
+}
+mdui-layout-main{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+mdui-list-item::part(headline){
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.sleft{
+    box-sizing: border-box;
+}
+.sleft mdui-list{
+    padding: 0.5rem 1rem;
+}
+.nopadding{
+    padding:0
+}
+.layout-container{
+    display: none;
+}
+mdui-text-field::part(suffix){
+    display:none!important;
+}
+mdui-text-field::part(prefix){
+    display:none!important;
+}
+@media screen {
+    mdui-navigation-drawer::part(panel){
+        display: flex;
+        flex-direction: column;
+    }
+    mdui-top-app-bar{
+        overflow: hidden;
+    }
+    .app-bar-control{
+        padding: 0.5rem 1rem;
+    }
+    mdui-navigation-drawer>.over-y{
+        padding: 0.75rem 1rem;
+    }
+    .app-bar-control mdui-text-field::part(container){
+        height: 3rem;
+    }
+    #login-container>mdui-card,#register-container>mdui-card{
+        width: 450px;
+        height: 400px;
+        padding: 2.5rem 1.5rem;
+    }
+    .margin-children>*{
+        margin-top: 2rem;
+    }
+    .margin-children>*:first-child{
+        margin-top: 0;
+    }
+    #btn-menu,#btn-mail-back{
+        display: none;
+    }
+
+    #mail-list{
+        width: 50%;
+    }
+}
+@media screen and (max-width: 840px) {
+    #btn-menu{
+        display: block;
+    }
+}
+@media screen and (min-width: 840px) {
+    #mail-list{
+        max-width: 360px;
+    }
+}
+@media screen and (max-width: 600px) {
+    #btn-mail-back{
+        display: block;
+    }
+    #app-bar{
+        width: 200%;
+        box-sizing: border-box;
+    }
+    #app-bar>div{
+        box-sizing: border-box;
+        max-width: 50%;
+    }
+    #login-container>mdui-card,#register-container>mdui-card{
+        height: 100%;
+        width:100%;
+        padding: 2.5rem 1.5rem;
+        border-radius: 0;
+    }
+    .layout-container>mdui-divider[vertical]{
+        display: none;
+    }
+    #mail-list{
+        width: 100%;
+    }
+    #mail-content{
+        min-width: 100%;
+        box-sizing: border-box;
+    }
+    #mail-container{
+        width: 200%;
+    }
+
+}
+#loading::part(body){
+    text-align: center;
+    overflow: hidden;
+}
+.app-bar-control mdui-text-field::part(input){
+    padding: 0.5rem 0;
+    text-overflow:ellipsis;
+    font-size: 0.9rem;
+}
+#mail-page-control{
+    width: 100%;
+    --shape-corner: 4px;
+}
+#mail-page-control mdui-segmented-button{
+    flex-grow: 0;
+}
+#mail-page-input::part(container){
+    border-radius: 0;
+    padding: 0;
+    font-size: 0.8rem;
+}
+#mail-page-input::part(container) .input-container{
+    width: 50%;
+}
+#mail-page-input::part(input){
+    padding:0.5rem;
+    text-align: center;
+}
+#mail-list mdui-list{
+    padding: 0.5rem;
+}
+.mail-list-item::part(container){
+    padding: 0.5rem
+}
+.mail-list-item>div>div{
+    max-width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#mail-content{
+    padding: 1rem;
+}
+#setting-list {
+    padding: 1rem;
+}
+#setting-list mdui-list-item{
+    padding: 0 1.5rem;
+}
+#setting-content {
+    width: 0;
+    flex-grow: 1;
+    padding: 1rem;
+}
+#setting-content>div{
+    display: none;
+}
+.fontsize07{
+    font-size: 0.7rem;
+}
+.fontsize08{
+    font-size: 0.8rem;
+}
+.bold{
+    font-weight: bold;
+}
+.h100{
+    height:100%;
+}
+.grow{
+    flex-grow: 1!important;
+}
+.shrink0{
+    flex-shrink: 0;
+}
+.w100{
+    width:100%;
+}
+.w200{
+    width:200%;
+}
+.flex{
+    display: flex;
+}
+.row {
+    flex-direction: row;
+}
+.column {
+    flex-direction: column;
+}
+.align-center {
+    align-items: center;
+}
+.flex-center{
+    justify-content:center;
+}
+.flex-end{
+    justify-content: flex-end;
+}
+.space-around{
+    justify-content: space-around;
+}
+.space-between{
+    justify-content: space-between;
+}
+.over-hidden{
+    overflow: hidden;
+}
+.over-y{
+    overflow-y: auto;
+}
+.text-center{
+    text-align: center;
+}
+
+.small-icon-button{
+    height: 2rem;
+    width: 2rem;
+    min-width: 2rem;
+}
+.text-field-row mdui-text-field,.text-field-row mdui-select{
+    margin: 0 1rem;
+}
